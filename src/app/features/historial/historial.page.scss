@@ -1,0 +1,82 @@
+ion-title {
+  font-weight: 800; font-size: 24px; color: #111; padding-left: 10px; text-align: left;
+}
+
+// Estilo del Segmento (Pestañas)
+.segment-wrapper {
+  padding: 0 16px 10px 16px;
+  ion-segment {
+    background: #eef1f6; border-radius: 12px; padding: 4px;
+    ion-segment-button {
+      --indicator-color: white; --color: #888; --color-checked: #111;
+      --border-radius: 10px; font-weight: 700; min-height: 36px;
+    }
+  }
+}
+
+// Tarjeta de "En Curso" (Estilo Ticket Activo)
+.active-ticket {
+  background: white; border-radius: 24px; padding: 20px;
+  box-shadow: 0 10px 30px rgba(45, 107, 255, 0.15); // Sombra azulada
+  border: 1px solid rgba(45, 107, 255, 0.1);
+  margin-bottom: 20px;
+
+  .ticket-header {
+    display: flex; justify-content: space-between; margin-bottom: 15px;
+    .badge { 
+      color: #2D6BFF; font-weight: 800; font-size: 12px; background: #eef4ff; 
+      padding: 6px 12px; border-radius: 20px;
+      &.pulse { animation: pulse 2s infinite; }
+    }
+    .id { color: #aaa; font-size: 12px; font-weight: 600; }
+  }
+
+  .ticket-body {
+    h3 { margin: 0 0 10px 0; font-size: 18px; font-weight: 700; }
+    .row { display: flex; align-items: center; gap: 8px; color: #666; font-size: 14px; margin-bottom: 6px; }
+  }
+
+  .ticket-footer {
+    margin-top: 20px; border-top: 1px dashed #eee; padding-top: 15px;
+    .action-btn {
+      width: 100%; background: #111; color: white; border: none; padding: 14px;
+      border-radius: 16px; font-weight: 700; font-size: 14px;
+    }
+  }
+}
+
+// Lista de Historial (Estilo Wallet)
+.history-item {
+  background: white; padding: 15px; border-radius: 20px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.2s;
+
+  &:active { transform: scale(0.98); }
+
+  .icon-box {
+    width: 50px; height: 50px; background: #f4f4f4; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 22px; color: #666;
+  }
+
+  .info {
+    flex: 1;
+    h4 { margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #111; }
+    p { margin: 0 0 8px 0; font-size: 12px; color: #999; }
+    
+    .status-pill {
+      font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 8px;
+      &.completed { background: #e8f8f0; color: #34c759; } // Verde
+      &.cancelled { background: #fff0f0; color: #ff3b30; } // Rojo
+    }
+  }
+
+  .price {
+    text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
+    span { font-weight: 800; font-size: 16px; color: #111; }
+    ion-icon { color: #ccc; font-size: 16px; }
+  }
+}
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

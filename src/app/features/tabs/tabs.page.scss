@@ -1,0 +1,66 @@
+ion-tab-bar {
+  border: none;
+  background: transparent;
+  padding-bottom: 0;
+  --background: transparent;
+}
+
+// LA ISLA FLOTANTE (Diseño Compacto)
+.floating-tab-bar {
+  position: absolute;
+  bottom: 40px; // Más arriba
+  
+  // TRUCO PARA CENTRAR SIN ESTIRAR
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto; // Que el ancho se ajuste al contenido
+  min-width: 280px; // Ancho mínimo para que no se vea apretado
+  
+  height: 65px;
+  border-radius: 50px; // Pastilla perfecta
+  background: #ffffff;
+  
+  // Sombra suave y elegante
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  
+  display: flex;
+  justify-content: space-between; // Separación uniforme
+  padding: 5px 15px; // Relleno interno
+  gap: 10px;
+}
+
+// BOTONES REDONDOS
+ion-tab-button {
+  --background: transparent;
+  --color: #666666; // Gris oscuro
+  --color-selected: #ffffff;
+  
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  
+  // Asegura que sea un círculo perfecto
+  flex: 0 0 50px;
+  margin: auto 0;
+
+  ion-icon {
+    font-size: 24px;
+  }
+
+  // EL CÍRCULO AZUL (ESTADO ACTIVO)
+  &.tab-selected {
+    --background: #2D6BFF;
+    background: #2D6BFF;
+    
+    // Resplandor azul
+    box-shadow: 0 8px 20px rgba(45, 107, 255, 0.4);
+    
+    // Animación de subida
+    transform: translateY(-5px); 
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    ion-icon {
+      color: white;
+    }
+  }
+}
