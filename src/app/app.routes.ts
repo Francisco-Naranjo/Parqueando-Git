@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -21,11 +22,13 @@ export const routes: Routes = [
 
   {
     path: 'app',
+    canActivate: [authGuard], // ✅ protege toda la app
     children: [
       {
         path: 'tabs',
         loadComponent: () =>
           import('./features/tabs/tabs.page').then((m) => m.TabsPage),
+
         children: [
           {
             path: 'home',
@@ -47,9 +50,11 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./features/perfil/perfil.page').then((m) => m.PerfilPage),
           },
+
           { path: '', redirectTo: '/app/tabs/mapa', pathMatch: 'full' },
         ],
       },
+
       { path: '', redirectTo: '/app/tabs/mapa', pathMatch: 'full' },
     ],
   },
@@ -57,36 +62,52 @@ export const routes: Routes = [
   {
     path: 'detalle-parqueadero',
     loadComponent: () =>
-      import('./features/detalle-parqueadero/detalle-parqueadero.page').then((m) => m.DetalleParqueaderoPage),
+      import('./features/detalle-parqueadero/detalle-parqueadero.page').then(
+        (m) => m.DetalleParqueaderoPage
+      ),
   },
+
   {
     path: 'checkout',
     loadComponent: () =>
       import('./features/checkout/checkout.page').then((m) => m.CheckoutPage),
   },
+
   {
     path: 'voucher',
     loadComponent: () =>
       import('./features/voucher/voucher.page').then((m) => m.VoucherPage),
   },
+
   {
     path: 'agregar-auto',
     loadComponent: () =>
-      import('./features/perfil/agregar-auto/agregar-auto.page').then((m) => m.AgregarAutoPage),
+      import('./features/perfil/agregar-auto/agregar-auto.page').then(
+        (m) => m.AgregarAutoPage
+      ),
   },
+
   {
     path: 'metodos-pago',
     loadComponent: () =>
-      import('./features/perfil/metodos-pago/metodos-pago.page').then((m) => m.MetodosPagoPage),
+      import('./features/perfil/metodos-pago/metodos-pago.page').then(
+        (m) => m.MetodosPagoPage
+      ),
   },
+
   {
     path: 'nuevo-metodo',
     loadComponent: () =>
-      import('./features/perfil/metodos-pago/nuevo-metodo/nuevo-metodo.page').then((m) => m.NuevoMetodoPage),
+      import('./features/perfil/metodos-pago/nuevo-metodo/nuevo-metodo.page').then(
+        (m) => m.NuevoMetodoPage
+      ),
   },
+
   {
-  path: 'mis-autos',
-  loadComponent: () =>
-    import('./features/perfil/mis-autos/mis-autos.page').then((m) => m.MisAutosPage),
-},
+    path: 'mis-autos',
+    loadComponent: () =>
+      import('./features/perfil/mis-autos/mis-autos.page').then(
+        (m) => m.MisAutosPage
+      ),
+  },
 ];

@@ -62,17 +62,17 @@ export class AuthService {
   }
 
   getUserId(): number | null {
-  const raw = localStorage.getItem('usuario');
-  if (!raw) return null;
+    const raw = localStorage.getItem('usuario');
+    if (!raw) return null;
 
-  try {
-    const u: any = JSON.parse(raw);
-    const id = u?.idUsuario ?? u?.id ?? u?.uid ?? u?.userId ?? null;
-    return id != null ? Number(id) : null;
-  } catch {
-    return null;
+    try {
+      const u: any = JSON.parse(raw);
+      const id = u?.idUsuario ?? u?.id ?? u?.uid ?? u?.userId ?? null;
+      return id != null ? Number(id) : null;
+    } catch {
+      return null;
+    }
   }
-}
 
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(
@@ -90,36 +90,56 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
-  // ✅ extra útil
+  /**
+   * ✅ Lee usuario desde localStorage y NORMALIZA campos
+   * Soporta:
+   * - Backend: { idUsuario, nombres, apellidos, correo, ... }
+   * - Viejo/local: { uid, nombre, email, ... }
+   */
   getUsuario(): UsuarioResponse | null {
-  const raw = localStorage.getItem('usuario');
+    const raw = localStorage.getItem('usuario');
+    if (!raw) return null;
 
-  if (!raw) {
-    return null;
-  }
+    try {
+      const u: any = JSON.parse(raw);
+      if (!u) return null;
 
-  try {
-    const usuario = JSON.parse(raw);
+      // ---- Normalizar ID ----
+      const idUsuario = u.idUsuario ?? u.id ?? u.uid ?? u.userId ?? null;
+      if (idUsuario == null) return null;
 
-    // Validación básica
-    if (!usuario || (!usuario.idUsuario && !usuario.id)) {
+      // ---- Normalizar correo ----
+      const correo = (u.correo ?? u.email ?? '').trim();
+      if (!correo) return null;
+
+      // ---- Normalizar nombres/apellidos ----
+      let nombres = (u.nombres ?? '').trim();
+      let apellidos = (u.apellidos ?? '').trim();
+
+      // Si viene como "nombre" o "nombreCompleto"
+      const nombreCompleto = (u.nombreCompleto ?? u.nombre ?? '').trim();
+      if ((!nombres || !apellidos) && nombreCompleto) {
+        const parts = nombreCompleto.split(/\s+/);
+        if (!nombres) nombres = parts[0] ?? 'Usuario';
+        if (!apellidos) apellidos = parts.slice(1).join(' ');
+      }
+
+      return {
+        idUsuario: Number(idUsuario),
+        nombres: nombres || 'Usuario',
+        apellidos: apellidos || '',
+        correo,
+        telefono: (u.telefono ?? '').toString(),
+        fotoPerfilUrl: u.fotoPerfilUrl ?? u.fotoUrl ?? '',
+        rolPrincipal: u.rolPrincipal ?? u.rol ?? 'CONDUCTOR',
+        esActivo: u.esActivo ?? u.activo ?? true,
+      } as UsuarioResponse;
+    } catch (e) {
+      console.error('Error leyendo usuario del localStorage', e);
       return null;
     }
-
-    // Normalizar propiedad del id
-    if (!usuario.idUsuario && usuario.id) {
-      usuario.idUsuario = usuario.id;
-    }
-
-    return usuario as UsuarioResponse;
-
-  } catch (e) {
-    console.error('Error leyendo usuario del localStorage', e);
-    return null;
   }
-}
 
-  // ✅ extra útil
   isLoggedIn(): boolean {
     return !!this.getToken();
   }

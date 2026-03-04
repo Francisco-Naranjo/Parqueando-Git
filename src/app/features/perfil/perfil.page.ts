@@ -1,16 +1,32 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, LoadingController, ToastController, AlertController } from '@ionic/angular';
+import {
+  IonicModule,
+  ToastController,
+  AlertController,
+  LoadingController,
+} from '@ionic/angular';
 import { Router } from '@angular/router';
 
 import { addIcons } from 'ionicons';
-import { personCircleOutline, logOutOutline, cameraOutline, createOutline, mailOutline, callOutline } from 'ionicons/icons';
+import {
+  personCircleOutline,
+  logOutOutline,
+  cameraOutline,
+  createOutline,
+  mailOutline,
+  callOutline,
+} from 'ionicons/icons';
+
+import { AuthService, UsuarioResponse } from 'src/app/services/auth.service';
 
 type PerfilView = {
   nombreCompleto: string;
   email: string;
   telefono?: string;
   fotoUrl?: string;
+  rol?: string;
+  activo?: boolean;
 };
 
 @Component({
@@ -21,70 +37,147 @@ type PerfilView = {
   styleUrls: ['./perfil.page.scss'],
 })
 export class PerfilPage implements OnInit {
-
-  private router = inject(Router);
-  private loadingCtrl = inject(LoadingController);
-  private toastCtrl = inject(ToastController);
-  private alertCtrl = inject(AlertController);
-
   perfil: PerfilView = {
     nombreCompleto: 'Cargando...',
     email: 'Cargando...',
     telefono: '',
-    fotoUrl: ''
+    fotoUrl: '',
+    rol: '',
+    activo: true,
   };
 
+  private usuarioRaw: UsuarioResponse | null = null;
+
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private toastCtrl: ToastController,
+    private alertCtrl: AlertController,
+    private loadingCtrl: LoadingController
+  ) {}
+
   ngOnInit(): void {
-    addIcons({ personCircleOutline, logOutOutline, cameraOutline, createOutline, mailOutline, callOutline });
-    this.cargarPerfil();
+    addIcons({
+      personCircleOutline,
+      logOutOutline,
+      cameraOutline,
+      createOutline,
+      mailOutline,
+      callOutline,
+    });
+
+    this.cargarPerfilDesdeSesion();
   }
 
-  async cargarPerfil() {
-    // ✅ Por ahora lo dejamos mock para que ya funcione la UI
-    // Luego lo conectamos al backend /api/auth/me o /api/usuarios/{id}
-    this.perfil = {
-      nombreCompleto: 'Fausto Cando',
-      email: 'fausto@email.com',
-      telefono: '',
-      fotoUrl: ''
-    };
+  ionViewWillEnter() {
+    // ✅ cada vez que entras a Perfil, refresca datos del localStorage
+    this.cargarPerfilDesdeSesion();
   }
+
+  private cargarPerfilDesdeSesion() {
+  // 1) Si no hay token => login (esto sí es correcto)
+  if (!this.auth.isLoggedIn()) {
+    this.router.navigateByUrl('/auth/login', { replaceUrl: true });
+    return;
+  }
+
+  // 2) Hay token, intentamos leer usuario
+  const u = this.auth.getUsuario();
+
+  // Si el usuario no está listo, NO lo mandes al login
+  if (!u) {
+    this.perfil = {
+      nombreCompleto: 'Usuario',
+      email: 'Sin datos',
+      telefono: '',
+      fotoUrl: '',
+      rol: '',
+      activo: true,
+    };
+    return;
+  }
+
+  this.usuarioRaw = u;
+
+  this.perfil = {
+    nombreCompleto: `${u.nombres ?? ''} ${u.apellidos ?? ''}`.trim() || 'Usuario',
+    email: u.correo ?? '',
+    telefono: u.telefono ?? '',
+    fotoUrl: u.fotoPerfilUrl ?? '',
+    rol: u.rolPrincipal ?? '',
+    activo: u.esActivo ?? true,
+  };
+}
 
   async cambiarFoto() {
     // ✅ Aquí luego conectamos Capacitor Camera + subir a backend
     const t = await this.toastCtrl.create({
       message: 'Pendiente: seleccionar foto y subirla al backend',
       duration: 2000,
-      position: 'bottom'
+      position: 'bottom',
     });
     await t.present();
   }
 
   async editarPerfil() {
+    if (!this.usuarioRaw) {
+      const t = await this.toastCtrl.create({
+        message: 'No se pudo leer la sesión del usuario',
+        duration: 2000,
+        position: 'bottom',
+      });
+      await t.present();
+      return;
+    }
+
     const alert = await this.alertCtrl.create({
       header: 'Editar perfil',
       inputs: [
-        { name: 'nombreCompleto', type: 'text', placeholder: 'Nombre completo', value: this.perfil.nombreCompleto },
-        { name: 'telefono', type: 'tel', placeholder: 'Teléfono', value: this.perfil.telefono ?? '' },
+        {
+          name: 'nombres',
+          type: 'text',
+          placeholder: 'Nombres',
+          value: this.usuarioRaw.nombres ?? '',
+        },
+        {
+          name: 'apellidos',
+          type: 'text',
+          placeholder: 'Apellidos',
+          value: this.usuarioRaw.apellidos ?? '',
+        },
+        {
+          name: 'telefono',
+          type: 'tel',
+          placeholder: 'Teléfono',
+          value: this.usuarioRaw.telefono ?? '',
+        },
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Guardar',
           handler: async (data) => {
-            // ✅ Aquí luego llamamos al endpoint update
-            this.perfil.nombreCompleto = (data.nombreCompleto ?? '').trim() || this.perfil.nombreCompleto;
-            this.perfil.telefono = (data.telefono ?? '').trim();
+            // ✅ Por ahora actualiza solo visualmente y en localStorage (mock)
+            // Luego lo conectamos a tu endpoint real de actualización (PUT/PATCH)
+            const nuevos: UsuarioResponse = {
+              ...this.usuarioRaw!,
+              nombres: (data.nombres ?? '').trim() || this.usuarioRaw!.nombres,
+              apellidos: (data.apellidos ?? '').trim() || this.usuarioRaw!.apellidos,
+              telefono: (data.telefono ?? '').trim(),
+            };
+
+            localStorage.setItem('usuario', JSON.stringify(nuevos));
+            this.cargarPerfilDesdeSesion();
 
             const t = await this.toastCtrl.create({
-              message: 'Perfil actualizado (mock)',
+              message: 'Perfil actualizado (local)',
               duration: 1500,
-              position: 'bottom'
+              position: 'bottom',
             });
             await t.present();
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
@@ -100,12 +193,11 @@ export class PerfilPage implements OnInit {
           text: 'Sí, salir',
           role: 'destructive',
           handler: async () => {
-            // ✅ Aquí luego borramos token (localStorage/Capacitor Preferences)
-            // localStorage.removeItem('token');
+            this.auth.logout();
             await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
