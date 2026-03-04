@@ -1,65 +1,28 @@
-<ion-content style="--background: #f8f9fd;">
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mapa</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-  <div class="header-container animate-fade-in">
-    <div class="location-chip">
-      <p>UBICACIÓN</p>
-      <h2>Quito, EC <ion-icon name="chevron-down-outline"></ion-icon></h2>
-    </div>
-    <div class="user-avatar">
-      <img src="https://i.pravatar.cc/150?img=68">
-    </div>
+<ion-content [fullscreen]="true">
+
+  <!-- ✅ Buscador fijo -->
+  <div class="search-overlay">
+    <ion-item lines="none" class="search-item">
+      <ion-icon name="search-outline" slot="start"></ion-icon>
+
+      <ion-input
+        placeholder="Buscar por dirección o título..."
+        (ionInput)="buscar($event)">
+      </ion-input>
+
+      <ion-button fill="clear" size="small" (click)="buscar({ detail: { value: '' } })">
+        Limpiar
+      </ion-button>
+    </ion-item>
   </div>
 
-  <div class="search-section animate-fade-in">
-    <div class="search-pill">
-      <ion-icon name="search-outline"></ion-icon>
-      <input type="text" placeholder="Buscar un lugar..." (input)="buscar($event)">
-      <div class="filter-btn" (click)="abrirFiltros()">
-        <ion-icon name="options-outline"></ion-icon>
-      </div>
-    </div>
-
-    <div class="quick-filters">
-      <div class="filter-chip active">Cerca</div>
-      <div class="filter-chip">Más popular</div>
-      <div class="filter-chip">Económico</div>
-    </div>
-  </div>
-
-  <div class="listings-container animate-fade-in">
-    <div *ngFor="let p of parqueaderos" class="spot-card" (click)="irADetalle(p)">
-      <div class="image-box">
-        <img [src]="p.imagenUrl">
-        <div class="rating-badge">★ {{ p.calificacion }}</div>
-      </div>
-      
-      <div class="info-box">
-        <div class="text-content">
-          <h3>{{ p.titulo }}</h3>
-          <p><ion-icon name="location-outline"></ion-icon> {{ p.direccion }}</p>
-        </div>
-        <div class="price-box">
-          <span class="currency">$</span>
-          <span class="amount">{{ p.tarifaHora }}</span>
-          <span class="unit">/hr</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="menu-island">
-    <div class="menu-item active">
-      <ion-icon name="grid-outline"></ion-icon>
-    </div>
-    <div class="menu-item" (click)="cambiarVista('mapa')">
-      <ion-icon name="location-outline"></ion-icon>
-    </div>
-    <div class="menu-item" (click)="cambiarVista('reservas')">
-      <ion-icon name="bookmark-outline"></ion-icon>
-    </div>
-    <div class="menu-item" (click)="cambiarVista('perfil')">
-      <ion-icon name="settings-outline"></ion-icon>
-    </div>
-  </div>
+  <!-- ✅ Mapa ocupa todo -->
+  <div id="map" class="leaflet-map"></div>
 
 </ion-content>

@@ -35,3 +35,24 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+@import "leaflet/dist/leaflet.css";
+
+/* ====== Leaflet price marker (GLOBAL) ====== */
+.price-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.price-pin {
+  background: #3880ff !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  padding: 6px 10px !important;
+  border-radius: 16px !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.45) !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
