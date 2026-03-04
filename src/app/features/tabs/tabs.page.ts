@@ -1,8 +1,25 @@
 import { Component, EnvironmentInjector, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-// IMPORTANTE: Asegúrate de que mapOutline esté aquí
-import { gridOutline, mapOutline, bookmarkOutline, personOutline, settingsOutline } from 'ionicons/icons';
+
+import {
+  gridOutline,
+  mapOutline,
+  bookmarkOutline,
+  personOutline,
+  settingsOutline,
+  addOutline,
+  carSportOutline,
+  walletOutline,
+  locationOutline,
+  notificationsOutline,
+  scanOutline,
+  timeOutline,
+  carOutline,
+  arrowBackOutline,
+  createOutline,
+  trashOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -12,10 +29,31 @@ import { gridOutline, mapOutline, bookmarkOutline, personOutline, settingsOutlin
   imports: [IonicModule],
 })
 export class TabsPage {
+
   public environmentInjector = inject(EnvironmentInjector);
 
   constructor() {
-    // Registramos TODOS los iconos que usaremos
-    addIcons({ gridOutline, mapOutline, bookmarkOutline, personOutline, settingsOutline });
+
+    // Registramos todos los iconos usados en la app
+    addIcons({
+      gridOutline,
+      mapOutline,
+      bookmarkOutline,
+      personOutline,
+      settingsOutline,
+      addOutline,
+      carSportOutline,
+      walletOutline,
+      locationOutline,
+      notificationsOutline,
+      scanOutline,
+      timeOutline,
+      carOutline,
+      arrowBackOutline,
+      createOutline,
+      trashOutline
+    });
+
   }
+
 }

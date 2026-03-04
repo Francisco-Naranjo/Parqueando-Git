@@ -1,138 +1,113 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Importamos ActionSheetController para el menú de opciones
-import { IonicModule, NavController, ModalController, ActionSheetController } from '@ionic/angular'; 
+import { IonicModule, LoadingController, ToastController, AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { addIcons } from 'ionicons';
-import { 
-  createOutline, carSportOutline, cardOutline, notificationsOutline, 
-  shieldCheckmarkOutline, helpCircleOutline, logOutOutline, addOutline, 
-  chevronForwardOutline, trashOutline, pencilOutline, starOutline 
-} from 'ionicons/icons';
 
-import { AgregarAutoPage } from './agregar-auto/agregar-auto.page';
+import { addIcons } from 'ionicons';
+import { personCircleOutline, logOutOutline, cameraOutline, createOutline, mailOutline, callOutline } from 'ionicons/icons';
+
+type PerfilView = {
+  nombreCompleto: string;
+  email: string;
+  telefono?: string;
+  fotoUrl?: string;
+};
 
 @Component({
   selector: 'app-perfil',
+  standalone: true,
+  imports: [CommonModule, IonicModule],
   templateUrl: './perfil.page.html',
   styleUrls: ['./perfil.page.scss'],
-  standalone: true,
-  imports: [CommonModule, IonicModule]
 })
 export class PerfilPage implements OnInit {
 
-  usuario = {
-    nombre: 'Francisco Naranjo',
-    email: 'francisco@arcastore.com',
-    avatar: 'https://i.pravatar.cc/300?u=francisco'
+  private router = inject(Router);
+  private loadingCtrl = inject(LoadingController);
+  private toastCtrl = inject(ToastController);
+  private alertCtrl = inject(AlertController);
+
+  perfil: PerfilView = {
+    nombreCompleto: 'Cargando...',
+    email: 'Cargando...',
+    telefono: '',
+    fotoUrl: ''
   };
 
-  vehiculos = [
-    { marca: 'Chery', modelo: 'Tiggo 7 Pro', placa: 'PBX-1234', principal: true, imagen: 'assets/car-placeholder.png' },
-    { marca: 'Chevrolet', modelo: 'Sail', placa: 'PCD-5678', principal: false, imagen: 'assets/car-placeholder.png' }
-  ];
-
-  opcionesCuenta = [
-    { icono: 'card-outline', titulo: 'Métodos de Pago', dato: 'Visa •••• 4242' },
-    { icono: 'notifications-outline', titulo: 'Notificaciones', dato: 'Activadas' },
-    { icono: 'shield-checkmark-outline', titulo: 'Seguridad y Privacidad', dato: '' },
-    { icono: 'help-circle-outline', titulo: 'Ayuda y Soporte', dato: '' }
-  ];
-
-  constructor(
-    private router: Router, 
-    private navCtrl: NavController,
-    private modalCtrl: ModalController,
-    private actionSheetCtrl: ActionSheetController // Inyectamos el controlador
-  ) {
-    addIcons({ 
-      createOutline, carSportOutline, cardOutline, notificationsOutline, 
-      shieldCheckmarkOutline, helpCircleOutline, logOutOutline, addOutline, 
-      chevronForwardOutline, trashOutline, pencilOutline, starOutline 
-    });
+  ngOnInit(): void {
+    addIcons({ personCircleOutline, logOutOutline, cameraOutline, createOutline, mailOutline, callOutline });
+    this.cargarPerfil();
   }
 
-  ngOnInit() {}
+  async cargarPerfil() {
+    // ✅ Por ahora lo dejamos mock para que ya funcione la UI
+    // Luego lo conectamos al backend /api/auth/me o /api/usuarios/{id}
+    this.perfil = {
+      nombreCompleto: 'Fausto Cando',
+      email: 'fausto@email.com',
+      telefono: '',
+      fotoUrl: ''
+    };
+  }
 
-  // 1. MENÚ DE OPCIONES (Soluciona tu error TS2339)
-  async abrirOpcionesAuto(auto: any) {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: `${auto.marca} ${auto.modelo}`,
-      subHeader: `Placa: ${auto.placa}`,
-      mode: 'ios',
+  async cambiarFoto() {
+    // ✅ Aquí luego conectamos Capacitor Camera + subir a backend
+    const t = await this.toastCtrl.create({
+      message: 'Pendiente: seleccionar foto y subirla al backend',
+      duration: 2000,
+      position: 'bottom'
+    });
+    await t.present();
+  }
+
+  async editarPerfil() {
+    const alert = await this.alertCtrl.create({
+      header: 'Editar perfil',
+      inputs: [
+        { name: 'nombreCompleto', type: 'text', placeholder: 'Nombre completo', value: this.perfil.nombreCompleto },
+        { name: 'telefono', type: 'tel', placeholder: 'Teléfono', value: this.perfil.telefono ?? '' },
+      ],
       buttons: [
+        { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Marcar como Principal',
-          icon: 'star-outline',
-          handler: () => { this.marcarComoPrincipal(auto); }
-        },
-        {
-          text: 'Editar Vehículo',
-          icon: 'pencil-outline',
-          handler: () => { this.editarAuto(auto); }
-        },
-        {
-          text: 'Eliminar del Garaje',
-          role: 'destructive',
-          icon: 'trash-outline',
-          handler: () => { this.eliminarAuto(auto); }
-        },
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          icon: 'close-outline'
+          text: 'Guardar',
+          handler: async (data) => {
+            // ✅ Aquí luego llamamos al endpoint update
+            this.perfil.nombreCompleto = (data.nombreCompleto ?? '').trim() || this.perfil.nombreCompleto;
+            this.perfil.telefono = (data.telefono ?? '').trim();
+
+            const t = await this.toastCtrl.create({
+              message: 'Perfil actualizado (mock)',
+              duration: 1500,
+              position: 'bottom'
+            });
+            await t.present();
+          }
         }
       ]
     });
-    await actionSheet.present();
+
+    await alert.present();
   }
 
-  // 2. LÓGICA CRUD: ELIMINAR
-  eliminarAuto(auto: any) {
-    this.vehiculos = this.vehiculos.filter(v => v !== auto);
-  }
-
-  // 3. LÓGICA CRUD: EDITAR
-  async editarAuto(auto: any) {
-    const modal = await this.modalCtrl.create({
-      component: AgregarAutoPage,
-      componentProps: { autoParaEditar: auto }, // Pasamos el auto al modal
-      breakpoints: [0, 0.75],
-      initialBreakpoint: 0.75
+  async cerrarSesion() {
+    const alert = await this.alertCtrl.create({
+      header: 'Cerrar sesión',
+      message: '¿Seguro que deseas cerrar sesión?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Sí, salir',
+          role: 'destructive',
+          handler: async () => {
+            // ✅ Aquí luego borramos token (localStorage/Capacitor Preferences)
+            // localStorage.removeItem('token');
+            await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
+          }
+        }
+      ]
     });
-    await modal.present();
 
-    const { data } = await modal.onWillDismiss();
-    if (data) {
-      const index = this.vehiculos.indexOf(auto);
-      if (index > -1) {
-        this.vehiculos[index] = data; // Reemplazamos con los nuevos datos
-      }
-    }
+    await alert.present();
   }
-
-  // 4. LÓGICA DE PRINCIPAL
-  marcarComoPrincipal(auto: any) {
-    this.vehiculos.forEach(v => v.principal = false);
-    auto.principal = true;
-  }
-
-  // AGREGAR NUEVO VEHÍCULO
-  async agregarVehiculo() {
-    const modal = await this.modalCtrl.create({
-      component: AgregarAutoPage,
-      breakpoints: [0, 0.75],
-      initialBreakpoint: 0.75
-    });
-    await modal.present();
-    const { data } = await modal.onWillDismiss();
-    if (data) {
-      if (data.principal) this.vehiculos.forEach(v => v.principal = false);
-      this.vehiculos.push(data);
-    }
-  }
-
-  abrirOpcion(titulo: string) { console.log('Opción:', titulo); }
-  editarPerfil() { console.log('Editando perfil...'); }
-  cerrarSesion() { this.navCtrl.navigateRoot('/auth/login'); }
 }

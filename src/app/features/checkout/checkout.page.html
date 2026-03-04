@@ -34,6 +34,30 @@
     </div>
   </div>
 
+<h3 class="section-title">Vehículo</h3>
+
+<div class="payment-methods">
+  <div *ngFor="let v of vehiculos"
+       class="method-option"
+       [class.active]="idVehiculoSeleccionado === v.id"
+       (click)="seleccionarVehiculo(v)">
+
+    <div class="method-info">
+      <span>{{ v.marca }} {{ v.modelo }}</span>
+      <p>Placa: {{ v.placa }} • {{ v.color || 'Sin color' }}</p>
+    </div>
+
+    <ion-icon name="checkmark-circle"
+              class="check-icon"
+              *ngIf="idVehiculoSeleccionado === v.id">
+    </ion-icon>
+  </div>
+</div>
+
+<ion-button expand="block" fill="outline" (click)="irAgregarAuto()">
+  Agregar vehículo
+</ion-button>
+
   <h3 class="section-title">Método de Pago</h3>
   
   <div class="payment-methods">

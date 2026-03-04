@@ -39,15 +39,17 @@ export class MapaPage implements OnInit {
   }
 
   buscar(event: any) {
-    const texto = event.target.value.toLowerCase();
-    if (texto && texto.trim() !== '') {
-      this.parqueaderos = this.parqueaderosFiltrados.filter(p => 
-        p.titulo.toLowerCase().includes(texto) || p.direccion.toLowerCase().includes(texto)
-      );
-    } else {
-      this.parqueaderos = [...this.parqueaderosFiltrados];
-    }
+  const texto = (event.target.value || '').toLowerCase();
+
+  if (texto.trim() !== '') {
+    this.parqueaderos = this.parqueaderosFiltrados.filter(p =>
+      (p.titulo || '').toLowerCase().includes(texto) ||
+      (p.direccion || '').toLowerCase().includes(texto)
+    );
+  } else {
+    this.parqueaderos = [...this.parqueaderosFiltrados];
   }
+}
 
   abrirFiltros() { console.log('Filtros'); }
   cambiarVista(v: string) { console.log(v); }

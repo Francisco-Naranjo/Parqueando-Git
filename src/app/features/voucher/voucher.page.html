@@ -11,17 +11,13 @@
 
 <ion-content class="ion-padding" style="--background: #f8f9fd;">
   <div class="ticket-container animate-fade-in">
-    
+
     <div class="ticket-header">
       <div class="qr-box">
-        <qrcode 
-          [qrdata]="qrData" 
-          [width]="200" 
-          [errorCorrectionLevel]="'M'"
-          [margin]="2">
+        <qrcode [qrdata]="qrData" [width]="200" [errorCorrectionLevel]="'M'" [margin]="2">
         </qrcode>
       </div>
-      <h2 class="booking-id">{{ reserva?.codigo }}</h2>
+      <h2 class="booking-id">{{ codigoReserva }}</h2>
       <p>Muestra este código al ingresar</p>
     </div>
 
@@ -35,29 +31,29 @@
       <div class="detail-row">
         <div class="item">
           <label>PARQUEADERO</label>
-          <span>{{ reserva?.parqueadero?.titulo }}</span>
+          <span>{{ data?.parqueadero?.titulo }}</span>
         </div>
       </div>
 
       <div class="detail-row">
         <div class="item">
           <label>FECHA</label>
-          <span>{{ reserva?.fecha || 'Hoy, 28 Feb' }}</span>
+          <span>{{ data?.fecha || 'Hoy, 28 Feb' }}</span>
         </div>
         <div class="item" style="text-align: right;">
           <label>DURACIÓN</label>
-          <span>{{ reserva?.horas }} Horas</span>
+          <span>{{ data?.horas }} Horas</span>
         </div>
       </div>
 
       <div class="detail-row">
         <div class="item">
           <label>VEHÍCULO</label>
-          <span>Placa: PBX-1234</span>
+          <span>Placa: {{ data?.vehiculo?.placa || 'N/D' }}</span>
         </div>
         <div class="item" style="text-align: right;">
           <label>TOTAL</label>
-          <span class="price-text">${{ reserva?.total | number:'1.2-2' }}</span>
+          <span class="price-text">${{ totalPagar | number:'1.2-2' }}</span>
         </div>
       </div>
     </div>

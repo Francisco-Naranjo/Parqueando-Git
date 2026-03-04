@@ -1,46 +1,39 @@
-<ion-header class="ion-no-border">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Nuevo Vehículo</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">
-        <ion-icon name="close-outline"></ion-icon>
-      </ion-button>
+    <ion-title>{{ titulo }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelar()">Volver</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  
-  <div class="form-container">
-    <div class="icon-header">
-      <div class="circle">
-        <ion-icon name="car-sport-outline"></ion-icon>
-      </div>
-    </div>
+  <ion-item>
+    <ion-label position="stacked">Marca</ion-label>
+    <ion-input [(ngModel)]="nuevoAuto.marca"></ion-input>
+  </ion-item>
 
-    <div class="input-group">
-      <label>Marca</label>
-      <ion-input [(ngModel)]="nuevoAuto.marca" placeholder="Ej: Chery" class="custom-input"></ion-input>
-    </div>
+  <ion-item>
+    <ion-label position="stacked">Modelo</ion-label>
+    <ion-input [(ngModel)]="nuevoAuto.modelo"></ion-input>
+  </ion-item>
 
-    <div class="input-group">
-      <label>Modelo</label>
-      <ion-input [(ngModel)]="nuevoAuto.modelo" placeholder="Ej: Tiggo 7 Pro" class="custom-input"></ion-input>
-    </div>
+  <ion-item>
+    <ion-label position="stacked">Placa</ion-label>
+    <ion-input [(ngModel)]="nuevoAuto.placa"></ion-input>
+  </ion-item>
 
-    <div class="input-group">
-      <label>Placa</label>
-      <ion-input [(ngModel)]="nuevoAuto.placa" placeholder="Ej: PBX-1234" class="custom-input"></ion-input>
-    </div>
+  <ion-item>
+    <ion-label position="stacked">Color</ion-label>
+    <ion-input [(ngModel)]="nuevoAuto.color"></ion-input>
+  </ion-item>
 
-    <div class="toggle-group">
-      <label>Vehículo Principal</label>
-      <ion-toggle [(ngModel)]="nuevoAuto.principal" mode="ios"></ion-toggle>
-    </div>
+  <ion-item>
+    <ion-label position="stacked">Fotos (opcional)</ion-label>
+    <input type="file" multiple (change)="onFilesSelected($event)" />
+  </ion-item>
 
-    <ion-button expand="block" class="save-btn" (click)="guardar()">
-      Guardar Auto
-    </ion-button>
-  </div>
-
+  <ion-button expand="block" (click)="guardar()">
+    {{ textoBoton }}
+  </ion-button>
 </ion-content>

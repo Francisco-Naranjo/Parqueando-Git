@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, NavController, ToastController, LoadingController } from '@ionic/angular'; // Agregamos LoadingController
+import { IonicModule, NavController, ToastController, LoadingController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { 
-  carSport, personOutline, mailOutline, lockClosedOutline, 
-  eyeOutline, eyeOffOutline 
-} from 'ionicons/icons';
+import { carSport, personOutline, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-registro',
@@ -22,56 +20,79 @@ export class RegistroPage {
   constructor(
     private navCtrl: NavController,
     private toastCtrl: ToastController,
-    private loadingCtrl: LoadingController // Inyectamos el loader
+    private loadingCtrl: LoadingController,
+    private auth: AuthService
   ) {
     addIcons({ carSport, personOutline, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline });
   }
 
   async registrarUsuario() {
-    // 1. Validar campos vacíos
-    if (!this.usuario.nombre || !this.usuario.email || !this.usuario.password) {
-      this.mostrarToast('Por favor, completa todos los campos', 'warning');
-      return;
-    }
-
-    // 2. Validar formato de email (Regex Estándar)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.usuario.email)) {
-      this.mostrarToast('Ingresa un correo electrónico válido', 'danger');
-      return;
-    }
-
-    // 3. Validar longitud de contraseña
-    if (this.usuario.password.length < 6) {
-      this.mostrarToast('La contraseña debe tener al menos 6 caracteres', 'warning');
-      return;
-    }
-
-    // 4. Simulación de Registro con Loading (UX Profesional)
-    const loading = await this.loadingCtrl.create({
-      message: 'Creando tu cuenta...',
-      spinner: 'crescent'
-    });
-    await loading.present();
-
-    // Simulamos una espera de red (aquí iría tu llamada a Firebase/API)
-    setTimeout(async () => {
-      await loading.dismiss();
-      
-      this.mostrarToast('¡Bienvenido a ParqueAndo!', 'success'); // Toast verde de éxito
-      
-      // Redirigir al Login o directamente al Home
-      this.navCtrl.navigateRoot('/auth/login');
-    }, 1500);
+  if (!this.usuario.nombre || !this.usuario.email || !this.usuario.password) {
+    this.mostrarToast('Por favor, completa todos los campos', 'warning');
+    return;
   }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(this.usuario.email)) {
+    this.mostrarToast('Ingresa un correo electrónico válido', 'danger');
+    return;
+  }
+
+  if (this.usuario.password.length < 6) {
+    this.mostrarToast('La contraseña debe tener al menos 6 caracteres', 'warning');
+    return;
+  }
+
+  const full = this.usuario.nombre.trim().replace(/\s+/g, ' ');
+  const parts = full.split(' ');
+  const apellidos = parts.length >= 2 ? parts.pop()! : full;
+  const nombres = parts.length ? parts.join(' ') : full;
+
+  const loading = await this.loadingCtrl.create({
+    message: 'Creando tu cuenta...',
+    spinner: 'crescent'
+  });
+  await loading.present();
+
+  this.auth.register({
+    nombres,
+    apellidos,
+    correo: this.usuario.email,
+    password: this.usuario.password,
+    rolPrincipal: 'CONDUCTOR'
+  }).subscribe({
+    next: async (res: any) => {
+      await loading.dismiss();
+      // backend -> RegisterResponse { ok, mensaje, uid }
+      if (res?.ok) {
+        await this.mostrarToast(res?.mensaje || 'Cuenta creada con éxito', 'success');
+        this.navCtrl.navigateRoot('/auth/login');
+      } else {
+        this.mostrarToast(res?.mensaje || 'No se pudo registrar', 'danger');
+      }
+    },
+    error: async (err) => {
+      await loading.dismiss();
+      console.log('REGISTER ERROR FULL =>', err);
+
+      const msg =
+        err?.error?.mensaje ||
+        err?.error?.message ||
+        (typeof err?.error === 'string' ? err.error : null) ||
+        'Error registrando usuario';
+
+      this.mostrarToast(msg, 'danger');
+    }
+  });
+}
 
   async mostrarToast(msg: string, color: string) {
     const toast = await this.toastCtrl.create({
       message: msg,
       duration: 2000,
-      color: color,
+      color,
       position: 'top',
-      mode: 'ios' // Estilo iOS para mayor elegancia
+      mode: 'ios'
     });
     await toast.present();
   }

@@ -1,79 +1,67 @@
-<ion-header class="ion-no-border">
+<ion-header>
   <ion-toolbar>
-    <ion-title style="font-weight: 800; padding-left: 20px;">Mis Actividades</ion-title>
+    <ion-title>Historial</ion-title>
   </ion-toolbar>
-  
+
   <ion-toolbar>
-    <div class="segment-wrapper">
-      <ion-segment [(ngModel)]="segmentoSeleccionado" mode="ios">
-        <ion-segment-button value="activos">
-          <ion-label>En Curso</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="historial">
-          <ion-label>Anteriores</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-    </div>
+    <ion-segment [(ngModel)]="filtro" (ionChange)="onFiltroChange()">
+      <ion-segment-button value="TODOS">
+        <ion-label>Todos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="PENDIENTE">
+        <ion-label>Pendiente</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="CONFIRMADA">
+        <ion-label>Confirmada</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="CANCELADA">
+        <ion-label>Cancelada</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="COMPLETADA">
+        <ion-label>Completada</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" style="--background: #f8f9fd;">
+<ion-content>
 
-  <div *ngIf="segmentoSeleccionado === 'activos'" class="animate-fade-in">
-    
-    <div *ngIf="reservasActivas.length === 0" class="empty-state">
-      <img src="assets/no-data.svg" alt="Sin reservas">
-      <p>No tienes reservas activas</p>
-    </div>
+  <ion-refresher slot="fixed" (ionRefresh)="cargarHistorial($event)">
+    <ion-refresher-content pullingText="Desliza para actualizar"></ion-refresher-content>
+  </ion-refresher>
 
-    <div class="ticket-card active-ticket" *ngFor="let item of reservasActivas">
-      <div class="ticket-header">
-        <span class="badge pulse">● En Vivo</span>
-        <span class="id">#{{ item.codigo }}</span>
-      </div>
-      <div class="ticket-body">
-        <h3>{{ item.parqueadero.titulo }}</h3>
-        
-        <div class="row">
-          <ion-icon name="time-outline"></ion-icon>
-          <span>Entrada: {{ item.entrada }}</span>
-        </div>
-        <div class="row">
-          <ion-icon name="calendar-outline"></ion-icon>
-          <span>{{ item.fecha }}</span>
-        </div>
-      </div>
-      <div class="ticket-footer">
-        <button class="action-btn" (click)="verTicket(item)">Ver Ticket QR</button>
-      </div>
-    </div>
+  <div class="empty" *ngIf="reservasFiltradas.length === 0">
+    <ion-icon name="time-outline"></ion-icon>
+    <h3>No hay reservas</h3>
+    <p>No se encontraron reservas para el filtro seleccionado.</p>
   </div>
 
-  <div *ngIf="segmentoSeleccionado === 'historial'" class="animate-fade-in">
-    
-    <div class="history-item" *ngFor="let item of historialPasado">
-      <div class="icon-box">
-        <ion-icon name="receipt-outline"></ion-icon>
-      </div>
-      
-      <div class="info">
-        <h4>{{ item.lugar }}</h4>
-        <p>{{ item.fecha }} • {{ item.duracion }}</p>
-        
-        <span class="status-pill" 
-              [ngClass]="{'completed': item.estado === 'completado', 'cancelled': item.estado === 'cancelado'}">
-          {{ item.estado | titlecase }}
-        </span>
-      </div>
+  <ion-list *ngIf="reservasFiltradas.length > 0">
+    <ion-item
+      button
+      detail="true"
+      *ngFor="let r of reservasFiltradas"
+      (click)="abrirReserva(r)"
+    >
+      <ion-label>
+        <div class="row1">
+          <h2>{{ r.parqueadero }}</h2>
+          <ion-badge [color]="badgeColor(r.estado)">{{ r.estado }}</ion-badge>
+        </div>
 
-      <div class="price">
-        <span>${{ item.total | number:'1.2-2' }}</span>
-        <ion-icon name="chevron-forward-outline"></ion-icon>
-      </div>
-    </div>
+        <p class="sub">
+          {{ r.codigo }} • {{ r.vehiculo }}
+        </p>
 
-  </div>
+        <p class="sub">
+          Inicio: {{ r.inicio }} • Fin: {{ r.fin }}
+        </p>
 
-  <div style="height: 100px;"></div>
+        <p class="meta">
+          Creada: {{ r.fechaCreacion }} • Total: ${{ r.total }}
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
 </ion-content>

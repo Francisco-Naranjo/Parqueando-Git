@@ -1,74 +1,51 @@
-<ion-content style="--background: #f8f9fd;">
-  
-  <div class="profile-header">
-    <div class="header-content">
-      <div class="avatar-container">
-        <img [src]="usuario.avatar" alt="Avatar">
-        <button class="edit-btn" (click)="editarPerfil()">
-          <ion-icon name="create-outline"></ion-icon>
-        </button>
-      </div>
-      <h2>{{ usuario.nombre }}</h2>
-      <p>{{ usuario.email }}</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="perfil-card">
+    <div class="avatar-wrap">
+      <ion-avatar class="avatar">
+        <img *ngIf="perfil.fotoUrl; else sinFoto" [src]="perfil.fotoUrl" />
+        <ng-template #sinFoto>
+          <ion-icon name="person-circle-outline" class="icon-avatar"></ion-icon>
+        </ng-template>
+      </ion-avatar>
+
+      <ion-button fill="solid" size="small" class="btn-foto" (click)="cambiarFoto()">
+        <ion-icon name="camera-outline" slot="start"></ion-icon>
+        Cambiar foto
+      </ion-button>
+    </div>
+
+    <div class="info">
+      <h2>{{ perfil.nombreCompleto }}</h2>
+
+      <p class="line">
+        <ion-icon name="mail-outline"></ion-icon>
+        <span>{{ perfil.email }}</span>
+      </p>
+
+      <p class="line" *ngIf="perfil.telefono">
+        <ion-icon name="call-outline"></ion-icon>
+        <span>{{ perfil.telefono }}</span>
+      </p>
     </div>
   </div>
 
-  <div class="content-body animate-up">
-    
-    <div class="section-header">
-      <h3>Mi Garaje</h3>
-      <button (click)="agregarVehiculo()">
-        <ion-icon name="add-outline"></ion-icon> Agregar
-      </button>
-    </div>
+  <ion-list inset="true">
+    <ion-item button (click)="editarPerfil()">
+      <ion-icon name="create-outline" slot="start"></ion-icon>
+      <ion-label>Editar perfil</ion-label>
+    </ion-item>
 
-    <div class="garage-carousel">
-      <div class="car-card" 
-           *ngFor="let auto of vehiculos" 
-           (click)="abrirOpcionesAuto(auto)">
-        
-        <div class="car-image">
-          <img [src]="auto.imagen || 'assets/car-placeholder.png'" alt="Car">
-        </div>
-        
-        <div class="car-info">
-          <div class="text">
-            <h4>{{ auto.marca }} {{ auto.modelo }}</h4>
-            <p>{{ auto.placa }}</p>
-          </div>
-          <span class="badge" *ngIf="auto.principal">Principal</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-header mt-4">
-      <h3>Cuenta</h3>
-    </div>
-
-    <div class="settings-list">
-      <div class="setting-item" 
-           *ngFor="let item of opcionesCuenta" 
-           (click)="abrirOpcion(item.titulo)">
-        
-        <div class="icon-box">
-          <ion-icon [name]="item.icono"></ion-icon>
-        </div>
-        <div class="info">
-          <span>{{ item.titulo }}</span>
-          <small *ngIf="item.dato">{{ item.dato }}</small>
-        </div>
-        <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
-      </div>
-    </div>
-
-    <div class="logout-container">
-      <button class="logout-btn" (click)="cerrarSesion()">
-        <ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión
-      </button>
-      <p class="version">Versión 1.0.0 • Arcastore S.A.</p>
-    </div>
-
-    <div style="height: 100px;"></div>
-  </div>
+    <ion-item button (click)="cerrarSesion()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      <ion-label color="danger">Cerrar sesión</ion-label>
+    </ion-item>
+  </ion-list>
 
 </ion-content>
